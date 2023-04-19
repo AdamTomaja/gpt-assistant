@@ -1,0 +1,59 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.0.5'
+    id 'io.spring.dependency-management' version '1.1.0'
+    id "com.diffplug.spotless" version "6.11.0"
+}
+
+group = 'com.cydercode'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // OpenAI
+    implementation 'com.theokanning.openai-gpt3-java:api:0.12.0'
+    implementation 'com.theokanning.openai-gpt3-java:client:0.12.0'
+    implementation 'com.theokanning.openai-gpt3-java:service:0.12.0'
+
+    // Matrix libs
+    implementation 'io.github.ma1uta.matrix:client-impl:0.12.0'
+    implementation 'io.github.ma1uta.matrix:jackson-support:0.12.0'
+    implementation 'org.jboss.resteasy:resteasy-client-microprofile:4.4.2.Final'
+    implementation group: 'javax.enterprise', name: 'cdi-api', version: '1.2'
+
+//    implementation 'org.jboss.resteasy:resteasy-jackson2-provider:4.4.2.Final'
+//    implementation 'ch.qos.logback:logback-classic:1.2.3'
+
+    // Database
+    runtimeOnly 'org.postgresql:postgresql'
+    implementation 'org.hibernate.validator:hibernate-validator:8.0.0.Final'
+
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.26'
+    annotationProcessor 'org.projectlombok:lombok:1.18.26'
+
+    // Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testCompileOnly 'org.projectlombok:lombok:1.18.26'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.26'
+}
+
+spotless {
+    java {
+        googleJavaFormat()
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
