@@ -1,0 +1,49 @@
+version: '3'
+
+services:
+  assistant:
+    image: "vault:5556/gpt-assistant:${ASSISTANT_VERSION}"
+    restart: unless-stopped
+    depends_on:
+      - db
+      - synapse
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - ASSISTANT_DB_URL=${ASSISTANT_DB_URL}
+      - ASSISTANT_DB_USERNAME=${ASSISTANT_DB_USERNAME}
+      - ASSISTANT_DB_PASSWORD=${ASSISTANT_DB_PASSWORD}
+      - ASSISTANT_MATRIX_DOMAIN=${ASSISTANT_MATRIX_DOMAIN}
+      - ASSISTANT_MATRIX_ROOM_ID=${ASSISTANT_MATRIX_ROOM_ID}
+      - ASSISTANT_MATRIX_USERNAME=${ASSISTANT_MATRIX_USERNAME}
+      - ASSISTANT_MATRIX_PASSWORD=${ASSISTANT_MATRIX_PASSWORD}
+      - ASSISTANT_OPENAI_TOKEN=${ASSISTANT_OPENAI_TOKEN}
+
+  mau:
+    image: "dock.mau.dev/mautrix/facebook:latest"
+    restart: unless-stopped
+    ports:
+      - "29319:29319"
+    volumes:
+      - "/mnt/raid0/matrix/mau:/data:z"
+
+  synapse:
+    image: docker.io/matrixdotorg/synapse:latest
+    restart: unless-stopped
+    volumes:
+      - /mnt/raid0/matrix/synapse-data:/data
+    depends_on:
+      - db
+    ports:
+      - "8008:8008"
+
+  db:
+    image: docker.io/postgres:latest
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${ASSISTANT_DB_USERNAME}
+      - POSTGRES_PASSWORD=${ASSISTANT_DB_PASSWORD}
+      - POSTGRES_INITDB_ARGS=--encoding='UTF8' --lc-collate='C' --lc-ctype='C'
+    volumes:
+      - /mnt/raid0/matrix/postgres-data:/var/lib/postgresql/data

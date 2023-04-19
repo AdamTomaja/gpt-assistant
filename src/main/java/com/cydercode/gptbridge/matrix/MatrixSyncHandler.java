@@ -23,7 +23,6 @@ public class MatrixSyncHandler {
 
   private final MatrixProperties matrixProperties;
   private final AssistantService assistantService;
-
   private final StandaloneClient standaloneClient;
 
   public void handleSync(SyncResponse syncResponse) {
