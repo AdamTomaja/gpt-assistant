@@ -8,3 +8,6 @@ It can be used as Matrix assistant too!
 
 ## System overview
 ![System overview chart](docs/flow-chart.png)
+
+## Example conversation
+<img src="docs/example_usage.png" alt="image_description" width="300" />
