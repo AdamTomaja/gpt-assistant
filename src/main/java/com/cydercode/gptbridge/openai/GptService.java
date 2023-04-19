@@ -9,7 +9,6 @@ import com.theokanning.openai.service.OpenAiService;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -30,20 +29,20 @@ public class GptService {
 
   private ChatCompletionRequest buildRequest(String message) {
     return ChatCompletionRequest.builder()
-            .messages(
-                Arrays.asList(
-                    new ChatMessage(ChatMessageRole.SYSTEM.value(), openAiProperties.getPrompt()),
-                    new ChatMessage(ChatMessageRole.USER.value(), message)))
-            .temperature(openAiProperties.getTemperature())
-            .model(openAiProperties.getModel())
-            .build();
+        .messages(
+            Arrays.asList(
+                new ChatMessage(ChatMessageRole.SYSTEM.value(), openAiProperties.getPrompt()),
+                new ChatMessage(ChatMessageRole.USER.value(), message)))
+        .temperature(openAiProperties.getTemperature())
+        .model(openAiProperties.getModel())
+        .build();
   }
 
   @NotNull
   private static String prepareResponse(List<ChatCompletionChoice> choices) {
     return choices.stream()
-            .map(ChatCompletionChoice::getMessage)
-            .map(ChatMessage::getContent)
-            .collect(Collectors.joining(","));
+        .map(ChatCompletionChoice::getMessage)
+        .map(ChatMessage::getContent)
+        .collect(Collectors.joining(","));
   }
 }

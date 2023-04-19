@@ -8,6 +8,6 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 public class AssistantProperties {
 
-    @Value("${assistant.initial-sync}")
-    private Boolean initialSync;
+  @Value("${assistant.initial-sync}")
+  private Boolean initialSync;
 }

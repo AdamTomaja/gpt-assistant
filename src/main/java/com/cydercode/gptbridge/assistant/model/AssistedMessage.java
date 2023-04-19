@@ -14,23 +14,23 @@ import lombok.ToString;
 @ToString
 public class AssistedMessage {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "assisted_message_id")
-    private Integer id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "assisted_message_id")
+  private Integer id;
 
-    @Column(name = "event_id", length = 100)
-    private String eventId;
+  @Column(name = "event_id", length = 100)
+  private String eventId;
 
-    @Column(name = "sender_id", length = 100)
-    private String senderId;
+  @Column(name = "sender_id", length = 100)
+  private String senderId;
 
-    @Column(name = "request_message", length = 2000)
-    private String request;
+  @Column(name = "request_message", length = 2000)
+  private String request;
 
-    @Column(name = "response_message", length = 2000)
-    private String response;
+  @Column(name = "response_message", length = 2000)
+  private String response;
 
-    @Column(name = "initial_sync")
-    private Boolean initialSync;
+  @Column(name = "initial_sync")
+  private Boolean initialSync;
 }

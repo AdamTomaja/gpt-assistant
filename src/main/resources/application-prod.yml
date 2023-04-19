@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: ${ASSISTANT_DB_URL}
+    username: ${ASSISTANT_DB_USERNAME}
+    password: ${ASSISTANT_DB_PASSWORD}
+
+matrix:
+  domain: ${ASSISTANT_MATRIX_DOMAIN}
+  roomId: ${ASSISTANT_MATRIX_ROOM_ID}
+  username: ${ASSISTANT_MATRIX_USERNAME}
+  password: ${ASSISTANT_MATRIX_PASSWORD}
+
+openai:
+  token: ${ASSISTANT_OPENAI_TOKEN}
+
+assistant:
+  initial-sync: false

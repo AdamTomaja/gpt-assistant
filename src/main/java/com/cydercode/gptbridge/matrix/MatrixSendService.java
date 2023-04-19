@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class MatrixSendService {
-    private final StandaloneClient matrixClient;
-    private final MatrixProperties matrixProperties;
+  private final StandaloneClient matrixClient;
+  private final MatrixProperties matrixProperties;
 
-    public void sendMessage(String message) {
-        matrixClient.event().sendMessage(matrixProperties.getRoomId(), message);
-    }
+  public void sendMessage(String message) {
+    matrixClient.event().sendMessage(matrixProperties.getRoomId(), message);
+  }
 }

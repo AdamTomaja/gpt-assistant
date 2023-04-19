@@ -9,7 +9,6 @@ import io.github.ma1uta.matrix.client.sync.SyncParams;
 import jakarta.annotation.PostConstruct;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,6 +32,7 @@ public class MatrixSyncService {
     log.info("Matrix auth successful: {}", loginResponse.toString());
     runSyncLoop();
   }
+
   private void runSyncLoop() {
     SyncLoop syncLoop = new SyncLoop(matrixClient.sync(), this::syncCallback);
     SyncParams syncParams =
