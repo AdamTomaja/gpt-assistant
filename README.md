@@ -10,4 +10,6 @@ It can be used as Matrix assistant too!
 ![System overview chart](docs/flow-chart.png)
 
 ## Example conversation
+https://www.youtube.com/shorts/9U9dT6Y0Zdw
+
 <img src="docs/example_usage.png" alt="image_description" width="300" />
