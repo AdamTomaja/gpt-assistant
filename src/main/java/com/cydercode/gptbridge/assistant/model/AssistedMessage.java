@@ -1,15 +1,13 @@
 package com.cydercode.gptbridge.assistant.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 @Entity
 @Table(name = "assisted_messages")
 @NoArgsConstructor
 @Builder
+@Getter
 @AllArgsConstructor
 @ToString
 public class AssistedMessage {

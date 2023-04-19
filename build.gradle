@@ -34,19 +34,16 @@ dependencies {
     implementation 'org.jboss.resteasy:resteasy-client-microprofile:4.4.2.Final'
     implementation group: 'javax.enterprise', name: 'cdi-api', version: '1.2'
 
-//    implementation 'org.jboss.resteasy:resteasy-jackson2-provider:4.4.2.Final'
-//    implementation 'ch.qos.logback:logback-classic:1.2.3'
-
     // Database
     runtimeOnly 'org.postgresql:postgresql'
     implementation 'org.hibernate.validator:hibernate-validator:8.0.0.Final'
-
 
     // Lombok
     compileOnly 'org.projectlombok:lombok:1.18.26'
     annotationProcessor 'org.projectlombok:lombok:1.18.26'
 
     // Testing
+    testImplementation("org.assertj:assertj-guava:3.24.2")
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testCompileOnly 'org.projectlombok:lombok:1.18.26'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.26'
