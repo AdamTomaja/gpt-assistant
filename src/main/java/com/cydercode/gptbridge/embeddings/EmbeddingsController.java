@@ -13,7 +13,7 @@ public class EmbeddingsController {
   private final EmbeddingService embeddingService;
 
   @PostMapping("/embeddings")
-  public Embedding createNote(@RequestBody Embedding requestedEmbedding) {
+  public Embedding createEmbedding(@RequestBody Embedding requestedEmbedding) {
     return embeddingService.createEmbedding(requestedEmbedding);
   }
 

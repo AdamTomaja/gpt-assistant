@@ -27,13 +27,7 @@ public class EmbeddingService {
         openAiEmbeddingService.createEmbedding(requestedEmbedding.getContent());
     List<Float> floatList = convertToFloat(doubleValues);
     String vectorId = pineconeService.upsert(floatList);
-    Embedding newEmbedding =
-        Embedding.builder()
-            .content(requestedEmbedding.getContent())
-            .vectorId(vectorId)
-            .type(requestedEmbedding.getType())
-            .build();
-
+    Embedding newEmbedding = requestedEmbedding.toBuilder().vectorId(vectorId).build();
     Embedding createdEmbedding = embeddingsRepository.save(newEmbedding);
     log.info("New embedding created: {}", createdEmbedding);
     return createdEmbedding;

@@ -20,6 +20,6 @@ public class PineconeProperties {
   @Value("${pinecone.projectId}")
   private String projectId;
 
-  @Value("${pinecone.indexName}")
+  @Value("${pinecone.index-name}")
   private String indexName;
 }

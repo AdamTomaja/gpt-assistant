@@ -10,4 +10,7 @@ public class AssistantProperties {
 
   @Value("${assistant.initial-sync}")
   private Boolean initialSync;
+
+  @Value("${assistant.system-prompt}")
+  private String systemPrompt;
 }

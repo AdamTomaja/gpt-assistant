@@ -2,7 +2,6 @@ package com.cydercode.gptbridge.matrix;
 
 import com.cydercode.gptbridge.assistant.AssistantService;
 import com.cydercode.gptbridge.matrix.config.MatrixProperties;
-import io.github.ma1uta.matrix.client.StandaloneClient;
 import io.github.ma1uta.matrix.client.model.sync.JoinedRoom;
 import io.github.ma1uta.matrix.client.model.sync.Rooms;
 import io.github.ma1uta.matrix.client.model.sync.SyncResponse;
@@ -23,7 +22,6 @@ public class MatrixSyncHandler {
 
   private final MatrixProperties matrixProperties;
   private final AssistantService assistantService;
-  private final StandaloneClient standaloneClient;
 
   public void handleSync(SyncResponse syncResponse) {
     log.info("Sync received: {}", syncResponse);
@@ -46,11 +44,6 @@ public class MatrixSyncHandler {
   }
 
   private void handleRoomMessage(RoomMessage<?> roomMessage) {
-    if (roomMessage.getSender().equals(standaloneClient.getUserId())) {
-      log.info("Ignoring my own message: eventId: [{}]", roomMessage.getEventId());
-      return;
-    }
-
     EventContent content = roomMessage.getContent();
     if (content instanceof Text textContent) {
       log.info(

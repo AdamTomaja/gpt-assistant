@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 import com.cydercode.gptbridge.assistant.config.AssistantProperties;
-import com.cydercode.gptbridge.assistant.model.AssistedMessage;
-import com.cydercode.gptbridge.assistant.model.AssistedMessagesRepository;
+import com.cydercode.gptbridge.assistant.model.Message;
+import com.cydercode.gptbridge.assistant.model.MessagesRepository;
 import com.cydercode.gptbridge.matrix.MatrixSendService;
 import com.cydercode.gptbridge.openai.GptService;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class AssistantServiceTest {
 
-  @Mock AssistedMessagesRepository repository;
+  @Mock MessagesRepository repository;
 
   @Mock AssistantProperties properties;
 
@@ -51,14 +51,14 @@ class AssistantServiceTest {
     when(repository.countAllByEventId(anyString())).thenReturn(0);
     when(properties.getInitialSync()).thenReturn(true);
 
-    ArgumentCaptor<AssistedMessage> captor = ArgumentCaptor.forClass(AssistedMessage.class);
+    ArgumentCaptor<Message> captor = ArgumentCaptor.forClass(Message.class);
 
     // when
     assistantService.handleMessage("ev", "se", "me");
 
     // then
     verify(repository).save(captor.capture());
-    AssistedMessage message = captor.getValue();
+    Message message = captor.getValue();
     assertThat(message.getInitialSync()).isTrue();
     assertThat(message.getRequest()).isEqualTo("me");
     assertThat(message.getResponse()).isNull();
@@ -74,7 +74,7 @@ class AssistantServiceTest {
     when(repository.countAllByEventId(anyString())).thenReturn(0);
     when(properties.getInitialSync()).thenReturn(true);
 
-    ArgumentCaptor<AssistedMessage> captor = ArgumentCaptor.forClass(AssistedMessage.class);
+    ArgumentCaptor<Message> captor = ArgumentCaptor.forClass(Message.class);
 
     // when
     assistantService.handleMessage("ev", "se", "me");

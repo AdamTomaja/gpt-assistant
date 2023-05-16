@@ -15,15 +15,13 @@ import lombok.ToString;
 @Entity
 @Table(name = "embeddings")
 @NoArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 @Getter
 @AllArgsConstructor
 @ToString
 public class Embedding {
   public enum EmbeddingType {
     NOTE,
-    QUESTION,
-    ANSWER,
     MEMORY
   }
 

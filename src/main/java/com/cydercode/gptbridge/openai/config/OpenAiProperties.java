@@ -17,6 +17,6 @@ public class OpenAiProperties {
   @Value("${openai.temperature}")
   private Double temperature;
 
-  @Value("${openai.prompt}")
-  private String prompt;
+  @Value("${openai.embeddings-model}")
+  private String embeddingsModel;
 }

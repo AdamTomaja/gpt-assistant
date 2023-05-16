@@ -1,20 +1,21 @@
 package com.cydercode.gptbridge.assistant.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.*;
 
 @Entity
-@Table(name = "assisted_messages")
+@Table(name = "messages")
 @NoArgsConstructor
 @Builder
 @Getter
 @AllArgsConstructor
 @ToString
-public class AssistedMessage {
+public class Message {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "assisted_message_id")
+  @Column(name = "message_id")
   private Integer id;
 
   @Column(name = "event_id", length = 100)
@@ -23,12 +24,12 @@ public class AssistedMessage {
   @Column(name = "sender_id", length = 100)
   private String senderId;
 
-  @Column(name = "request_message", length = 2000)
-  private String request;
+  @Column(name = "content", length = 2000)
+  private String content;
 
-  @Column(name = "response_message", length = 2000)
-  private String response;
+  @Column(name = "created_at", nullable = false)
+  private LocalDateTime createdAt;
 
-  @Column(name = "initial_sync")
-  private Boolean initialSync;
+  @Column(name = "updated_at")
+  private LocalDateTime updatedAt;
 }

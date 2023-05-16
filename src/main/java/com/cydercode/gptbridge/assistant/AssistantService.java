@@ -1,10 +1,16 @@
 package com.cydercode.gptbridge.assistant;
 
 import com.cydercode.gptbridge.assistant.config.AssistantProperties;
-import com.cydercode.gptbridge.assistant.model.AssistedMessage;
-import com.cydercode.gptbridge.assistant.model.AssistedMessagesRepository;
+import com.cydercode.gptbridge.assistant.model.Message;
+import com.cydercode.gptbridge.assistant.model.MessagesRepository;
 import com.cydercode.gptbridge.matrix.MatrixSendService;
 import com.cydercode.gptbridge.openai.GptService;
+import com.theokanning.openai.completion.chat.ChatMessage;
+import com.theokanning.openai.completion.chat.ChatMessageRole;
+import io.github.ma1uta.matrix.client.StandaloneClient;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,8 +19,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class AssistantService {
-  private final AssistedMessagesRepository repository;
+  private final MessagesRepository repository;
   private final AssistantProperties assistantProperties;
+  private final StandaloneClient standaloneClient;
+
   private final MatrixSendService matrixSendService;
   private final GptService gptService;
 
@@ -24,40 +32,48 @@ public class AssistantService {
       return;
     }
 
+    takeMessage(eventId, senderId, message);
     if (assistantProperties.getInitialSync()) {
-      saveAsInitialSync(eventId, senderId, message);
+      log.info("Skipping further processing (initial sync enabled)");
       return;
     }
 
-    assist(eventId, senderId, message);
+    if (isUserMessage(senderId)) {
+      log.info("Message from user: {}", message);
+      var conversation = buildConversation();
+      log.info("Conversion: {}", conversation);
+      var response = gptService.complete(conversation);
+      matrixSendService.sendMessage(response);
+    }
   }
 
-  private void assist(String eventId, String senderId, String message) {
-    String completion = gptService.complete(message);
-    matrixSendService.sendMessage(completion);
+  private List<ChatMessage> buildConversation() {
+    var messages = repository.findTop20ByOrderByCreatedAtDesc();
+    Collections.reverse(messages);
+    return messages.stream().map(this::buildChatMessage).toList();
+  }
 
-    saveMessage(
-        AssistedMessage.builder()
-            .response(completion)
-            .request(message)
-            .initialSync(false)
+  private ChatMessage buildChatMessage(Message message) {
+    var role =
+        isUserMessage(message.getSenderId()) ? ChatMessageRole.USER : ChatMessageRole.ASSISTANT;
+    return new ChatMessage(role.value(), message.getContent());
+  }
+
+  private boolean isUserMessage(String senderId) {
+    return !senderId.equals(standaloneClient.getUserId());
+  }
+
+  private void takeMessage(String eventId, String senderId, String message) {
+    takeMessage(
+        Message.builder()
+            .content(message)
             .senderId(senderId)
             .eventId(eventId)
+            .createdAt(LocalDateTime.now())
             .build());
   }
 
-  private void saveAsInitialSync(String eventId, String senderId, String message) {
-    AssistedMessage assistedMessage =
-        AssistedMessage.builder()
-            .eventId(eventId)
-            .senderId(senderId)
-            .request(message)
-            .initialSync(true)
-            .build();
-    saveMessage(assistedMessage);
-  }
-
-  private AssistedMessage saveMessage(AssistedMessage assistedMessage) {
+  private Message takeMessage(Message assistedMessage) {
     log.info("Saving new message: [{}]", assistedMessage);
     return repository.save(assistedMessage);
   }
