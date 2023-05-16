@@ -1,10 +1,13 @@
 package com.cydercode.gptbridge.assistant.model;
 
-import java.util.List;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MessagesRepository extends JpaRepository<Message, Integer> {
   int countAllByEventId(String eventId);
 
-  List<Message> findTop20ByOrderByCreatedAtDesc();
+  @NotNull
+  Page<Message> findAll(@NotNull Pageable pageable);
 }

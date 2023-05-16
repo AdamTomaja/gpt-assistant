@@ -13,4 +13,7 @@ public class AssistantProperties {
 
   @Value("${assistant.system-prompt}")
   private String systemPrompt;
+
+  @Value("${assistant.conversation-length}")
+  private int conversationLength;
 }

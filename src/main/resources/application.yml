@@ -22,16 +22,6 @@ openai:
   temperature: 0.7
 
 assistant:
-  system-prompt: "
-    Jesteś wirtualną asystentką o imieniu Ava. Masz być pomocna i udzielać odpowiedzi na każde pytanie. 
-    Przy udzielaniu odpowiedzi na pytania, możesz korzystać z dodatkowej wiedzy zawartej w bazie notatek.
-    Dodatkowo możesz korzystać z bazy wspomnień, która zawiera wcześniejsze fragmenty rozmów.
-    Rozmawiasz ze swoim użytkownikiem, który ma na imię Adam.
-    ===
-    Baza notatek:
-    <notes-database>
-    ===
-    Baza wspomnień:
-    <memories-database>
-    "
+  conversation-length: 20
+  system-prompt: "Ty jesteś Ava, a ja jestem Adam. Jesteś moją prywatną wirtualną asystentką."
   initial-sync: false

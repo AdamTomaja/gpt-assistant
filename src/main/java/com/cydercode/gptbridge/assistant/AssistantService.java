@@ -5,12 +5,7 @@ import com.cydercode.gptbridge.assistant.model.Message;
 import com.cydercode.gptbridge.assistant.model.MessagesRepository;
 import com.cydercode.gptbridge.matrix.MatrixSendService;
 import com.cydercode.gptbridge.openai.GptService;
-import com.theokanning.openai.completion.chat.ChatMessage;
-import com.theokanning.openai.completion.chat.ChatMessageRole;
-import io.github.ma1uta.matrix.client.StandaloneClient;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,10 +16,12 @@ import org.springframework.stereotype.Service;
 public class AssistantService {
   private final MessagesRepository repository;
   private final AssistantProperties assistantProperties;
-  private final StandaloneClient standaloneClient;
-
   private final MatrixSendService matrixSendService;
   private final GptService gptService;
+  private final ConversationService conversationService;
+
+  private final MemoryService memoryService;
+  private final UsersService usersService;
 
   public void handleMessage(String eventId, String senderId, String message) {
     if (repository.countAllByEventId(eventId) > 0) {
@@ -38,29 +35,14 @@ public class AssistantService {
       return;
     }
 
-    if (isUserMessage(senderId)) {
+    if (usersService.isUserMessage(senderId)) {
+      memoryService.saveMemoryIfNecessary(message);
       log.info("Message from user: {}", message);
-      var conversation = buildConversation();
+      var conversation = conversationService.buildConversation();
       log.info("Conversion: {}", conversation);
       var response = gptService.complete(conversation);
       matrixSendService.sendMessage(response);
     }
-  }
-
-  private List<ChatMessage> buildConversation() {
-    var messages = repository.findTop20ByOrderByCreatedAtDesc();
-    Collections.reverse(messages);
-    return messages.stream().map(this::buildChatMessage).toList();
-  }
-
-  private ChatMessage buildChatMessage(Message message) {
-    var role =
-        isUserMessage(message.getSenderId()) ? ChatMessageRole.USER : ChatMessageRole.ASSISTANT;
-    return new ChatMessage(role.value(), message.getContent());
-  }
-
-  private boolean isUserMessage(String senderId) {
-    return !senderId.equals(standaloneClient.getUserId());
   }
 
   private void takeMessage(String eventId, String senderId, String message) {
