@@ -1,4 +1,4 @@
-package com.cydercode.gptbridge.notes;
+package com.cydercode.gptbridge.embeddings;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ public class EmbeddingsController {
   }
 
   @PostMapping("/embeddings/search")
-  public List<String> search(@RequestBody Embedding note) {
+  public List<Embedding> search(@RequestBody Embedding note) {
     return embeddingService.search(note);
   }
 }

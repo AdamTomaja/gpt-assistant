@@ -1,4 +1,4 @@
-package com.cydercode.gptbridge.notes;
+package com.cydercode.gptbridge.embeddings;
 
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;

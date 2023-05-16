@@ -1,4 +1,4 @@
-package com.cydercode.gptbridge.notes;
+package com.cydercode.gptbridge.embeddings;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,7 +23,8 @@ public class Embedding {
   public enum EmbeddingType {
     NOTE,
     QUESTION,
-    ANSWER
+    ANSWER,
+    MEMORY
   }
 
   @Id

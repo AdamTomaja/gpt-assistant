@@ -1,4 +1,4 @@
-package com.cydercode.gptbridge.notes;
+package com.cydercode.gptbridge.embeddings;
 
 import com.cydercode.gptbridge.openai.OpenAiEmbeddingService;
 import com.cydercode.gptbridge.pinecone.PineconeService;
@@ -39,7 +39,7 @@ public class EmbeddingService {
     return createdEmbedding;
   }
 
-  public List<String> search(Embedding searchedEmbedding) {
+  public List<Embedding> search(Embedding searchedEmbedding) {
     log.info("Searching for embeddings by: {}", searchedEmbedding);
 
     List<Double> embedding = openAiEmbeddingService.createEmbedding(searchedEmbedding.getContent());
@@ -48,7 +48,7 @@ public class EmbeddingService {
     List<String> vectorsIds = getVectorIds(vectors);
     log.info("Found vectors: {}", vectorsIds);
 
-    List<String> embeddings = getSortedEmbeddings(vectors, vectorsIds);
+    List<Embedding> embeddings = getSortedEmbeddings(vectors, vectorsIds);
     log.info("Found embeddings: {}", embeddings);
 
     return embeddings;
@@ -58,12 +58,11 @@ public class EmbeddingService {
     return vectors.getMatchesList().stream().map(ScoredVector::getId).collect(Collectors.toList());
   }
 
-  private List<String> getSortedEmbeddings(SingleQueryResults vectors, List<String> vectorsIds) {
+  private List<Embedding> getSortedEmbeddings(SingleQueryResults vectors, List<String> vectorsIds) {
     Comparator<Embedding> comparator = createEmbeddingComparator(vectors);
 
     return embeddingsRepository.findByVectorIds(vectorsIds).stream()
         .sorted(comparator.reversed())
-        .map(Embedding::getContent)
         .collect(Collectors.toList());
   }
 
