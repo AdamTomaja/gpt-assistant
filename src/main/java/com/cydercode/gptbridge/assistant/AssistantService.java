@@ -21,7 +21,6 @@ public class AssistantService {
   private final MatrixSendService matrixSendService;
   private final GptService gptService;
   private final ConversationService conversationService;
-
   private final MemoryService memoryService;
   private final UsersService usersService;
 
@@ -34,6 +33,7 @@ public class AssistantService {
     }
 
     takeMessage(eventId, senderId, message);
+
     if (assistantProperties.getInitialSync()) {
       log.info("Skipping further processing (initial sync enabled)");
       return;
