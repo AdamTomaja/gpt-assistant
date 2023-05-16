@@ -17,7 +17,12 @@ services:
       - ASSISTANT_MATRIX_USERNAME=${ASSISTANT_MATRIX_USERNAME}
       - ASSISTANT_MATRIX_PASSWORD=${ASSISTANT_MATRIX_PASSWORD}
       - ASSISTANT_OPENAI_TOKEN=${ASSISTANT_OPENAI_TOKEN}
-
+      - PINECONE_TOKEN=${PINECONE_TOKEN}
+      - PINECONE_ENVIRONMENT=${PINECONE_ENVIRONMENT}
+      - PINECONE_PROJECT_ID=${PINECONE_PROJECT_ID}
+      - PINECONE_NAMESPACE=${PINECONE_NAMESPACE}
+      - PINECONE_INDEX_NAME=${PINECONE_INDEX_NAME}
+      - ASSISTANT_INITIAL_SYNC=false
   mau:
     image: "dock.mau.dev/mautrix/facebook:latest"
     restart: unless-stopped
@@ -25,7 +30,6 @@ services:
       - "29319:29319"
     volumes:
       - "/mnt/raid0/matrix/mau:/data:z"
-
   synapse:
     image: docker.io/matrixdotorg/synapse:latest
     restart: unless-stopped
@@ -35,7 +39,6 @@ services:
       - db
     ports:
       - "8008:8008"
-
   db:
     image: docker.io/postgres:latest
     restart: unless-stopped
