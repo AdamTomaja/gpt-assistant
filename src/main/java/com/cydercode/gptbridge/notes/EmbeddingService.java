@@ -4,8 +4,8 @@ import com.cydercode.gptbridge.openai.OpenAiEmbeddingService;
 import com.cydercode.gptbridge.pinecone.PineconeService;
 import io.pinecone.proto.ScoredVector;
 import io.pinecone.proto.SingleQueryResults;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,19 +45,38 @@ public class EmbeddingService {
     List<Double> embedding = openAiEmbeddingService.createEmbedding(searchedEmbedding.getContent());
     List<Float> floatList = convertToFloat(embedding);
     SingleQueryResults vectors = pineconeService.search(floatList);
-    List<String> vectorsIds =
-        vectors.getMatchesList().stream().map(ScoredVector::getId).collect(Collectors.toList());
+    List<String> vectorsIds = getVectorIds(vectors);
     log.info("Found vectors: {}", vectorsIds);
 
-    List<String> embeddings =
-        vectorsIds.stream()
-            .map(embeddingsRepository::findOneByVectorId)
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .map(Embedding::getContent)
-            .collect(Collectors.toList());
+    List<String> embeddings = getSortedEmbeddings(vectors, vectorsIds);
     log.info("Found embeddings: {}", embeddings);
+
     return embeddings;
+  }
+
+  private List<String> getVectorIds(SingleQueryResults vectors) {
+    return vectors.getMatchesList().stream().map(ScoredVector::getId).collect(Collectors.toList());
+  }
+
+  private List<String> getSortedEmbeddings(SingleQueryResults vectors, List<String> vectorsIds) {
+    Comparator<Embedding> comparator = createEmbeddingComparator(vectors);
+
+    return embeddingsRepository.findByVectorIds(vectorsIds).stream()
+        .sorted(comparator.reversed())
+        .map(Embedding::getContent)
+        .collect(Collectors.toList());
+  }
+
+  private Comparator<Embedding> createEmbeddingComparator(SingleQueryResults vectors) {
+    return Comparator.comparingDouble(
+        emb -> {
+          ScoredVector scoredVector =
+              vectors.getMatchesList().stream()
+                  .filter(vector -> vector.getId().equals(emb.getVectorId()))
+                  .findFirst()
+                  .orElse(null);
+          return scoredVector != null ? scoredVector.getScore() : 0.0;
+        });
   }
 
   @NotNull
