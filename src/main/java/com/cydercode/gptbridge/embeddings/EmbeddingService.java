@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,46 +32,44 @@ public class EmbeddingService {
     return createdEmbedding;
   }
 
-  public List<Embedding> search(Embedding searchedEmbedding) {
+  public List<QueryEmbedding> search(String message) {
+    return search(Embedding.builder().content(message).build());
+  }
+
+  public List<QueryEmbedding> search(Embedding searchedEmbedding) {
     log.info("Searching for embeddings by: {}", searchedEmbedding);
 
     List<Double> embedding = openAiEmbeddingService.createEmbedding(searchedEmbedding.getContent());
     List<Float> floatList = convertToFloat(embedding);
+
     SingleQueryResults vectors = pineconeService.search(floatList);
     List<String> vectorsIds = getVectorIds(vectors);
     log.info("Found vectors: {}", vectorsIds);
+    return mergeData(vectors);
+  }
 
-    List<Embedding> embeddings = getSortedEmbeddings(vectors, vectorsIds);
+  private List<QueryEmbedding> mergeData(SingleQueryResults vectors) {
+    List<String> vectorsIds = getVectorIds(vectors);
+    List<Embedding> embeddings = embeddingsRepository.findByVectorIds(vectorsIds);
     log.info("Found embeddings: {}", embeddings);
 
-    return embeddings;
+    return embeddings.stream()
+        .map(em -> new QueryEmbedding(em, matchVector(em.getVectorId(), vectors)))
+        .sorted(Comparator.comparingDouble(QueryEmbedding::getScore).reversed())
+        .collect(Collectors.toList());
+  }
+
+  private ScoredVector matchVector(String vectorId, SingleQueryResults vectors) {
+    return vectors.getMatchesList().stream()
+        .filter(vector -> vector.getId().equals(vectorId))
+        .findFirst()
+        .orElseThrow();
   }
 
   private List<String> getVectorIds(SingleQueryResults vectors) {
     return vectors.getMatchesList().stream().map(ScoredVector::getId).collect(Collectors.toList());
   }
 
-  private List<Embedding> getSortedEmbeddings(SingleQueryResults vectors, List<String> vectorsIds) {
-    Comparator<Embedding> comparator = createEmbeddingComparator(vectors);
-
-    return embeddingsRepository.findByVectorIds(vectorsIds).stream()
-        .sorted(comparator.reversed())
-        .collect(Collectors.toList());
-  }
-
-  private Comparator<Embedding> createEmbeddingComparator(SingleQueryResults vectors) {
-    return Comparator.comparingDouble(
-        emb -> {
-          ScoredVector scoredVector =
-              vectors.getMatchesList().stream()
-                  .filter(vector -> vector.getId().equals(emb.getVectorId()))
-                  .findFirst()
-                  .orElse(null);
-          return scoredVector != null ? scoredVector.getScore() : 0.0;
-        });
-  }
-
-  @NotNull
   private static List<Float> convertToFloat(List<Double> doubleValues) {
     return doubleValues.stream().map(Double::floatValue).collect(Collectors.toList());
   }

@@ -1,6 +1,8 @@
 package com.cydercode.gptbridge.assistant;
 
 import com.cydercode.gptbridge.assistant.config.AssistantProperties;
+import com.cydercode.gptbridge.assistant.intention.Intention;
+import com.cydercode.gptbridge.assistant.intention.IntentionService;
 import com.cydercode.gptbridge.assistant.model.Message;
 import com.cydercode.gptbridge.assistant.model.MessagesRepository;
 import com.cydercode.gptbridge.matrix.MatrixSendService;
@@ -23,6 +25,8 @@ public class AssistantService {
   private final MemoryService memoryService;
   private final UsersService usersService;
 
+  private final IntentionService intentionService;
+
   public void handleMessage(String eventId, String senderId, String message) {
     if (repository.countAllByEventId(eventId) > 0) {
       log.info("Ignoring already handled message, eventId: [{}]", eventId);
@@ -36,9 +40,12 @@ public class AssistantService {
     }
 
     if (usersService.isUserMessage(senderId)) {
-      memoryService.saveMemoryIfNecessary(message);
+      Intention intention = intentionService.getIntention(message);
+      if (intention == Intention.STATEMENT) {
+        memoryService.saveMemory(message);
+      }
       log.info("Message from user: {}", message);
-      var conversation = conversationService.buildConversation();
+      var conversation = conversationService.buildConversation(intention);
       log.info("Conversion: {}", conversation);
       var response = gptService.complete(conversation);
       matrixSendService.sendMessage(response);

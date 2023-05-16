@@ -18,7 +18,7 @@ public class EmbeddingsController {
   }
 
   @PostMapping("/embeddings/search")
-  public List<Embedding> search(@RequestBody Embedding note) {
+  public List<QueryEmbedding> search(@RequestBody Embedding note) {
     return embeddingService.search(note);
   }
 }

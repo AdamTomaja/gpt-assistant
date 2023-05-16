@@ -13,5 +13,12 @@ matrix:
 openai:
   token: ${ASSISTANT_OPENAI_TOKEN}
 
+pinecone:
+  token: ${PINECONE_TOKEN}
+  environment: ${PINECONE_ENVIRONMENT}
+  projectId: ${PINECONE_PROJECT_ID}
+  namespace: ${PINECONE_NAMESPACE}
+  index-name: ${PINECONE_INDEX_NAME}
+
 assistant:
   initial-sync: false

@@ -1,6 +1,5 @@
 package com.cydercode.gptbridge.assistant;
 
-import com.cydercode.gptbridge.assistant.intention.Intention;
 import com.cydercode.gptbridge.assistant.intention.IntentionService;
 import com.cydercode.gptbridge.embeddings.Embedding;
 import com.cydercode.gptbridge.embeddings.EmbeddingService;
@@ -18,16 +17,8 @@ public class MemoryService {
   private final EmbeddingService embeddingsService;
 
   @Async
-  public void saveMemoryIfNecessary(String message) {
-    try {
-      Intention intention = intentionService.getIntention(message);
-      if (intention == Intention.STATEMENT) {
-        embeddingsService.createEmbedding(
-            Embedding.builder().content(message).type(Embedding.EmbeddingType.MEMORY).build());
-      }
-    } catch (Exception e) {
-      log.error("Error during intention detection", e);
-      return;
-    }
+  public void saveMemory(String message) {
+    embeddingsService.createEmbedding(
+        Embedding.builder().content(message).type(Embedding.EmbeddingType.MEMORY).build());
   }
 }

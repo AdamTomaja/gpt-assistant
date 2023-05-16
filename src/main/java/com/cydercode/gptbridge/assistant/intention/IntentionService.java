@@ -27,11 +27,16 @@ public class IntentionService {
   private final GptService gptService;
 
   public Intention getIntention(String message) {
-    List<ChatMessage> messages = new ArrayList<>();
-    messages.add(new ChatMessage(ChatMessageRole.SYSTEM.value(), PROMPT));
-    messages.add(new ChatMessage(ChatMessageRole.USER.value(), message));
-    String response = gptService.complete(messages);
-    log.info("Intention response: {}", response);
-    return Intention.valueOf(response.toUpperCase().replace(".", ""));
+    try {
+      List<ChatMessage> messages = new ArrayList<>();
+      messages.add(new ChatMessage(ChatMessageRole.SYSTEM.value(), PROMPT));
+      messages.add(new ChatMessage(ChatMessageRole.USER.value(), message));
+      String response = gptService.complete(messages);
+      log.info("Intention response: {}", response);
+      return Intention.valueOf(response.toUpperCase().replace(".", ""));
+    } catch (Exception e) {
+      log.error("Error while getting intention", e);
+      return Intention.UNKNOWN;
+    }
   }
 }

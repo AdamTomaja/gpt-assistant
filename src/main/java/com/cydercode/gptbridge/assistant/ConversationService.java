@@ -1,8 +1,11 @@
 package com.cydercode.gptbridge.assistant;
 
 import com.cydercode.gptbridge.assistant.config.AssistantProperties;
+import com.cydercode.gptbridge.assistant.intention.Intention;
 import com.cydercode.gptbridge.assistant.model.Message;
 import com.cydercode.gptbridge.assistant.model.MessagesRepository;
+import com.cydercode.gptbridge.embeddings.EmbeddingService;
+import com.cydercode.gptbridge.embeddings.QueryEmbedding;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import java.util.ArrayList;
@@ -21,14 +24,29 @@ public class ConversationService {
   private final AssistantProperties assistantProperties;
   private final UsersService usersService;
 
-  public List<ChatMessage> buildConversation() {
+  private final EmbeddingService embeddingService;
+
+  public List<ChatMessage> buildConversation(Intention intention) {
     var conversation =
         new ArrayList<>(
             findLastMessages().getContent().stream().map(this::buildChatMessage).toList());
+    if (intention == Intention.QUESTION) {
+      conversation.addAll(getMemories(conversation.get(0)));
+    }
     conversation.add(
         new ChatMessage(ChatMessageRole.ASSISTANT.value(), assistantProperties.getSystemPrompt()));
     Collections.reverse(conversation);
     return conversation;
+  }
+
+  private List<ChatMessage> getMemories(ChatMessage chatMessage) {
+    String message = chatMessage.getContent();
+    List<QueryEmbedding> embeddings = embeddingService.search(message);
+    return embeddings.stream().map(this::createMemoryChatMessage).toList();
+  }
+
+  private ChatMessage createMemoryChatMessage(QueryEmbedding queryEmbedding) {
+    return new ChatMessage(ChatMessageRole.USER.value(), queryEmbedding.embedding().getContent());
   }
 
   private Page<Message> findLastMessages() {
